@@ -1,6 +1,6 @@
 import sys
 sys.path.insert(1, '/home/pi/lcd')
-import lcddriver
+import drivers
 import time
 from curio import sleep
 from bricknil import attach, start
@@ -16,6 +16,7 @@ import kociemba
 import numpy as np
 import math
 
+VERSION = "Rubik Solver 1.3"
 
 @attach(ExternalMotor, name='rotation',capabilities=['sense_speed'])
 @attach(ExternalMotor, name='retourne',capabilities=['sense_speed'])
@@ -38,6 +39,26 @@ class Rubik(PoweredUpHub):
     retourne_vitesse=0
     rotation_vitesse=0
 
+    table_conversion = {
+        "B":    "b1B",
+        "B'":   "b4B",
+        "B2":   "b2B",
+        "D":    "cCb1cCcCcC",
+        "D'":   "cCb4cCcCcC",
+        "D2":   "cCb2cCcCcC",
+        "F":    "cCcCb1cCcC",
+        "F'":   "cCcCb4cCcC",
+        "F2":   "cCcCb2cCcC",
+        "R":    "B3cCb1cCcCcCB0",
+        "R'":   "B3cCb4cCcCcCB0",
+        "R2":   "B3cCb2cCcCcCB0",
+        "L":    "B0cCb1cCcCcCB3",
+        "L'":   "B0cCb4cCcCcCB3",
+        "L2":   "B0cCb2cCcCcCB3",
+        "U":    "cCcCcCb1cC",
+        "U'":   "cCcCcCb4cC",
+        "U2":   "cCcCcCb2cC"
+    }
 
 ############################################################
 # Fonctions d'étalonnage de la rotation
@@ -284,8 +305,7 @@ class Rubik(PoweredUpHub):
     async def run(self):
         display.lcd_display_string("                ", 2) # Write line of text to second line of display
 
-        await self.etalonne_rotation(2)
-
+        await self.etalonne_rotation(1)
         await self.lecture_cube()
         await self.decode_cube()
         await self.resolution_cube()        
@@ -298,45 +318,9 @@ class Rubik(PoweredUpHub):
         self.mouvements_simples=""
 
         if (True):
-            for mouvement in self.mouvements.split():                
-                if   (mouvement == "B") :
-                    self.mouvements_simples+="b1B";
-                elif (mouvement == "B'") :
-                    self.mouvements_simples+="b4B";     
-                elif (mouvement == "B2") :
-                    self.mouvements_simples+="b2B";
-                elif (mouvement == "D") :
-                    self.mouvements_simples+="cCb1cCcCcC";
-                elif (mouvement == "D'") :
-                    self.mouvements_simples+="cCb4cCcCcC";
-                elif (mouvement == "D2") :
-                    self.mouvements_simples+="cCb2cCcCcC";
-                elif (mouvement == "F") :
-                    self.mouvements_simples+="cCcCb1cCcC";
-                elif (mouvement == "F'") :
-                    self.mouvements_simples+="cCcCb4cCcC";
-                elif (mouvement == "F2") :
-                    self.mouvements_simples+="cCcCb2cCcC";
-                elif (mouvement == "R") :
-                    self.mouvements_simples+="B3cCb1cCcCcCB0";
-                elif (mouvement == "R'") :
-                    self.mouvements_simples+="B3cCb4cCcCcCB0";
-                elif (mouvement == "R2") :
-                    self.mouvements_simples+="B3cCb2cCcCcCB0";
-                elif (mouvement == "L") :
-                    self.mouvements_simples+="B0cCb1cCcCcCB3";
-                elif (mouvement == "L'") :
-                    self.mouvements_simples+="B0cCb4cCcCcCB3";
-                elif (mouvement == "L2") :
-                    self.mouvements_simples+="B0cCb2cCcCcCB3";
-                elif (mouvement == "U") :
-                    self.mouvements_simples+="cCcCcCb1cC";
-                elif (mouvement == "U'") :
-                    self.mouvements_simples+="cCcCcCb4cC";
-                elif (mouvement == "U2") :
-                    self.mouvements_simples+="cCcCcCb2cC";               
-                else:
-                    pass
+            for mouvement in self.mouvements.split():  
+                self.mouvements_simples+=self.table_conversion[mouvement];             
+            print("mouvements:")
             print(self.mouvements_simples)
             
             ##### Réduction du nombre de mouvements ###################################
@@ -373,7 +357,7 @@ class Rubik(PoweredUpHub):
                 self.mouvements_simples=self.mouvements_simples[:-1]
 
             ###########################################################################
-
+            print("mouvements (après optimisation):")
             print(self.mouvements_simples)
             nb=len(self.mouvements_simples)
             await self.etalonne_rotation(1)
@@ -414,8 +398,8 @@ async def system1():
     rotation = Rubik('Rubik')
 
 if __name__ == '__main__':
-    display = lcddriver.lcd()
-    display.lcd_display_string("Rubik Solver 1.2", 1) # Write line of text to first line of display
+    display = drivers.Lcd()
+    display.lcd_display_string(VERSION, 1) # Write line of text to first line of display
     display.lcd_display_string("                ", 2) # Write line of text to second line of display
     camera = PiCamera()
     camera.resolution=(640,480)
