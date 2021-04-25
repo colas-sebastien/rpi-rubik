@@ -10,7 +10,7 @@
 
 ## Software installation
 
-### Raspbian
+### Raspberry Pi OS Lite
 ```
 sudo apt-get update
 sudo apt-get upgrade
