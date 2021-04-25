@@ -65,3 +65,16 @@ With the Raspberry configuration tool:
 ```
 sudo raspi-config
 ```
+
+# rpi-rubik
+
+## Installation
+```
+git clone https://github.com/colas-sebastien/rpi-rubik.git
+```
+
+## run
+```
+cd rpi-rubik
+sudo python3 ./rubik.py
+```
