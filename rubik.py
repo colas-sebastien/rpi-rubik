@@ -18,8 +18,8 @@ import math
 
 VERSION = "Rubik Solver 1.3"
 
-@attach(ExternalMotor, name='rotation',capabilities=['sense_speed'])
-@attach(ExternalMotor, name='retourne',capabilities=['sense_speed'])
+@attach(ExternalMotor, name='retourne',port=0, capabilities=['sense_speed'])
+@attach(ExternalMotor, name='rotation',port=1, capabilities=['sense_speed'])
 class Rubik(PoweredUpHub):
     angle_ajustemment=300
     angle_rotation=450
